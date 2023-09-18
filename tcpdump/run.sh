@@ -1,9 +1,12 @@
+#!/bin/bash
+
 docker run \
--v /root/workspace/arm-gnu-toolchain-12.2.rel1-x86_64-aarch64_be-none-linux-gnu:/cross_compiler \
+-v $CROSS_COMPILER_PATH:/cross_compiler \
 -v $(pwd):/mnt \
--e CROSS_COMPILER_PREFIX=aarch64_be-none-linux-gnu \
--e CROSS_COMPILER_PATH=/cross_compiler/bin \
--e http_proxy=http://192.168.64.1:7890 \
--e https_proxy=http://192.168.64.1:7890 \
+-e CROSS_COMPILER_PREFIX=$CROSS_COMPILER_PREFIX \
+-e CROSS_COMPILER_PATH=/cross_compiler/$CROSS_COMPILER_BINARY \
+-e http_proxy=$http_proxy \
+-e https_proxy=$http_proxy \
+--rm \
 -it \
-ubuntu:22.04 /mnt/tcpdump.sh
+ubuntu:22.04 /mnt/download_compile_tcpdump.sh

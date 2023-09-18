@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 此脚本用于在docker环境中执行，编译tcpdump并拷贝到/mnt中
-
+set -e
 
 ####################################################### 
 # 检查环境变量
@@ -18,11 +18,15 @@ then
     exit 1
 fi
 
-# 设置代理
-export http_proxy=http://192.168.64.1:7890
-export https_proxy=http://192.168.64.1:7890
+# 安装常用命令(apt清华镜像源)
+mv /etc/apt/sources.list /etc/apt/sources.list.bkup
+tee /etc/apt/sources.list << EOF
+deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy main restricted universe multiverse
+deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+deb [trusted=yes] http://security.ubuntu.com/ubuntu/ jammy-security main restricted universe multiverse
+EOF
 
-# 安装常用命令
 apt update
 apt install git -y
 mkdir /sysroot
@@ -36,7 +40,10 @@ mkdir /workspace && cd /workspace
 
 ##########################################################
 # 1. 下载libpcap
-echo "download and build libpcap"
+echo "########################################"
+echo "步骤1/2 下载并安装 libpcap"
+echo "#######################################"
+
 cd /workspace
 git clone https://github.com/the-tcpdump-group/libpcap
 cd libpcap
@@ -50,7 +57,9 @@ make install DESTDIR=/sysroot
 
 
 #2.下载tcpdump
-echo "download and build 下载tcpdump"
+echo "########################################"
+echo "步骤2/2 下载并安装 tcpdump"
+echo "#######################################"
 cd /workspace
 git clone https://github.com/the-tcpdump-group/tcpdump
 cd tcpdump
@@ -69,7 +78,9 @@ make -j8 V=1
 
 
 ###########################################################
-echo "success! copy tcpdump to /mnt"
+echo "########################################"
+echo "执行成功！ 拷贝tcpdump到当前目录"
+echo "#######################################"
 cp tcpdump /mnt
 ###########################################################
 
